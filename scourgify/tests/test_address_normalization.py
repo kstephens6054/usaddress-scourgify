@@ -54,6 +54,12 @@ from scourgify.validations import (
 )
 from yamlconf import ConfigError
 
+# Python 2.x compatibility hack
+try:
+    from __builtin__ import unicode as uc_type
+except ImportError:
+    uc_type = str
+
 # Constants
 SERVICE = 'GBR Test Normalization'
 # Helper Functions & Classes
@@ -578,7 +584,7 @@ class TestAddressNormalizationUtils(TestCase):
         addtl_args = 'Addition info'
         expected = "{}: {}, {}".format(error_title, error_msg, addtl_args)
         error = AddressNormalizationError(error_msg, error_title, addtl_args)
-        self.assertEqual(expected, str(error))
+        self.assertEqual(expected, uc_type(error))
 
     @mock.patch.object(address_constants.NormalizationConfig, 'get')
     def test_set_constants(self, mock_config_get):
@@ -616,35 +622,35 @@ class TestAddressNormalizationUtils(TestCase):
         )
 
     def test_handle_abnormal_occupancy(self):
-        addr_str = '123 SW MAIN UN'
+        addr_str = u'123 SW MAIN UN'
         expected = OrderedDict([
-            ('AddressNumber', '123'),
-            ('StreetNamePreDirectional', 'SW'),
-            ('StreetName', 'MAIN'),
-            ('StreetNamePostType', 'UN'),
+            ('AddressNumber', u'123'),
+            ('StreetNamePreDirectional', u'SW'),
+            ('StreetName', u'MAIN'),
+            ('StreetNamePostType', u'UN'),
         ])
         result = parse_address_string(addr_str)
         self.assertEqual(expected, result)
 
-        addr_str = '123 SW MAIN UN A'
+        addr_str = u'123 SW MAIN UN A'
         expected = OrderedDict([
-            ('AddressNumber', '123'),
-            ('StreetNamePreDirectional', 'SW'),
-            ('StreetName', 'MAIN'),
-            ('OccupancyType', 'UN'),
-            ('OccupancyIdentifier', 'A')
+            ('AddressNumber', u'123'),
+            ('StreetNamePreDirectional', u'SW'),
+            ('StreetName', u'MAIN'),
+            ('OccupancyType', u'UN'),
+            ('OccupancyIdentifier', u'A')
         ])
         result = parse_address_string(addr_str)
         self.assertEqual(expected, result)
 
-        addr_str = '123 SW MAIN UN, UN A'
+        addr_str = u'123 SW MAIN UN, UN A'
         expected = OrderedDict([
-            ('AddressNumber', '123'),
-            ('StreetNamePreDirectional', 'SW'),
-            ('StreetName', 'MAIN'),
-            ('StreetNamePostType', 'UN'),
-            ('OccupancyType', 'UN'),
-            ('OccupancyIdentifier', 'A')
+            ('AddressNumber', u'123'),
+            ('StreetNamePreDirectional', u'SW'),
+            ('StreetName', u'MAIN'),
+            ('StreetNamePostType', u'UN'),
+            ('OccupancyType', u'UN'),
+            ('OccupancyIdentifier', u'A')
         ])
         result = parse_address_string(addr_str)
         self.assertEqual(expected, result)

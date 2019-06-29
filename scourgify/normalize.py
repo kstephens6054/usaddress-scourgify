@@ -55,6 +55,12 @@ from scourgify.validations import (
     validate_us_postal_code_format,
 )
 
+# Python 2.x compatibility hack
+try:
+    from __builtin__ import unicode as uc_type
+except ImportError:
+    uc_type = str
+
 # Setup
 
 # Constants
@@ -576,7 +582,7 @@ def get_addr_line_str(addr_dict, addr_parts=None, comma_separate=False):
         raise TypeError('addr_parts must be a list or tuple')
     separator = ', ' if comma_separate else ' '
     addr_str = separator.join(
-        str(addr_dict[elem]) for elem in addr_parts if addr_dict.get(elem)
+        uc_type(addr_dict[elem]) for elem in addr_parts if addr_dict.get(elem)
     )
     return addr_str
 
@@ -625,7 +631,7 @@ def get_ordinal_indicator(number):
     :return: ordinal indicator appropriate to the number supplied.
     :rtype: str
     """
-    str_num = str(number)
+    str_num = uc_type(number)
     digits = len(str_num)
     if str_num[-1] == '1' and not (digits >= 2 and str_num[-2:] == '11'):
         return 'st'
